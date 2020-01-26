@@ -1,9 +1,17 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Lib
     ( Account (..)
     , traditionalIraYear
     , rothIraYear
     , compoundYearly
+    , formatAccountRow
+    , printAccountTable
     ) where
+
+import Formatting (sformat, (%), (%.))
+import Formatting.Formatters (left, fixed)
+import qualified Data.Text.IO as TextIO
 
 stockGrowth = 0.07
 effectiveIncomeTax = 0.32
@@ -49,3 +57,14 @@ rothIraYear investibleIncome iraContribution =
 
 compoundYearly :: Int -> (Account -> Account) -> Account -> [Account]
 compoundYearly years fn = take years . iterate fn
+
+--                     0123456789012345|0123456789012345|0123456789012345|
+accountHeader =       " Non-retirement |       Post-tax |        Pre-Tax |"
+accountTableDivider = "---------------------------------------------------"
+accountColFormat = (left 15 ' ' %. fixed 2) % " |"
+accountRowFormat = accountColFormat % accountColFormat % accountColFormat
+formatAccountRow account = sformat accountRowFormat (nonRetirement account) (postTax account) (preTax account)
+printAccountTable accounts = do
+  putStrLn accountHeader
+  putStrLn accountTableDivider
+  mapM_ (TextIO.putStrLn . formatAccountRow) accounts
