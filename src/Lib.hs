@@ -53,7 +53,7 @@ stockGrowthYear account =
   where
     stockMultiplier = 1 + stockGrowth
     sfn = (stockMultiplier *)
-    capitalGained = stockGrowth * (nonRetirement account)
+    capitalGained = stockGrowth * nonRetirement account
     cfn = (capitalGained +)
 
 traditionalIraYear :: Double -> Double -> Account -> Account
@@ -75,13 +75,12 @@ compoundYearly years fn = take years . iterate fn
 
 withdrawableNonRetirement :: Account -> Double
 withdrawableNonRetirement account =
-  (nonRetirement account) - longTermCapitalGainsTax * (capitalGained account)
+  nonRetirement account - longTermCapitalGainsTax * capitalGained account
 withdrawablePreTax :: Account -> Double
 withdrawablePreTax account =
-  (preTax account) * (1 - preTaxWithdrawalIncomeTax)
+  preTax account * (1 - preTaxWithdrawalIncomeTax)
 withdrawablePostTax :: Account -> Double
-withdrawablePostTax account =
-  (postTax account)
+withdrawablePostTax = postTax 
 
 withdrawableNetAmount :: Account -> Double
 withdrawableNetAmount account = wnr + wpret + wpostt
@@ -108,5 +107,5 @@ printAccountTable accounts = do
   where
     finalAccount = last accounts
     printFooterAmount label amount =
-      TextIO.putStrLn $ sformat (label % (fixed 2)) amount
+      TextIO.putStrLn $ sformat (label % fixed 2) amount
 
